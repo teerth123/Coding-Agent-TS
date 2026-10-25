@@ -5,8 +5,23 @@ const app = express()
 app.use(express.json())
 
 app.post("/agent", async(req, res)=>{
-    const {prompt} = req.body
-    const result = await agenticLoop(prompt)
+    const {prompt, memoryID} = req.body
+
+    const history = [{
+            role:"system",
+            content:"you are helpful coding agent with tools"
+        }]
+
+    //making db call to get the memory object with the memory id
+    if(!memoryID){
+        history.push(
+        {
+            role:"user",
+            content:prompt
+        }
+        )
+    }
+    const result = await agenticLoop(history)
 
     return res.json({
         "msg":result

@@ -1,8 +1,8 @@
 1. I have to pass the memory from outside, the problem I was thinking was is that - how can i pass it from backend, I have to first install openrouter sdk for that, ultimately the decision I made is just passing single json instead of making it chatMessages from openrouter
 2. subagents concept is too broad --> i want to implement multiagent orchestration, for that I need to allow creating subagents by subagents. For this I need to count depth every time. 
 3. There are so many things like catching the bug or error introduced due to wrong input and timeout and such things, also auth and all , so its a lot of polishing work is remaining
-4. 
-
+4. the subagents can be maintained by creating a state for agents. This state can contain the depth of agents, if curDepth > maxDepth then we can add conditions that can prevent creating multiple subagents. I don't think we have state like object right now in our project. 
+5. the github token we are using in this project is fine grained not classic. Access given is -
 
 ### Whats remaining
 

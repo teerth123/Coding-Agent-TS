@@ -1,0 +1,110 @@
+BE server running on 3k
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-83f41b284d1f585f",
+  content: "{\"stdout\":\"\",\"stderr\":\"Cloning into 'HPC-ESE'...\\nwarning: You appear to have cloned an empty repository.\\n\",\"exitCode\":0,\"message\":\"Repository cloned and Git identity configured\",\"repoPath\":\"/home/user/HPC-ESE\"}",
+}
+ ------ bashTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-95a6c29a5b85e7c1",
+  content: "{\"result\":{\"exitCode\":0,\"stdout\":\"total 12\\ndrwx------ 3 user user  128 Nov  2 16:33 .\\ndrwxr-xr-x 3 root root   60 Oct 20 22:34 ..\\n-rw-r--r-- 1 user user  220 Jul 12 16:58 .bash_logout\\n-rw-r--r-- 1 user user 3526 Jul 12 16:58 .bashrc\\n-rw-r--r-- 1 user user  807 Jul 12 16:58 .profile\\n-rw-r--r-- 1 user user    0 Oct 27 19:11 .sudo_as_admin_successful\\ndrwxr-xr-x 3 user user   60 Nov  2 16:33 HPC-ESE\\n\",\"stderr\":\"\"},\"stderr\":\"\",\"stdout\":\"total 12\\ndrwx------ 3 user user  128 Nov  2 16:33 .\\ndrwxr-xr-x 3 root root   60 Oct 20 22:34 ..\\n-rw-r--r-- 1 user user  220 Jul 12 16:58 .bash_logout\\n-rw-r--r-- 1 user user 3526 Jul 12 16:58 .bashrc\\n-rw-r--r-- 1 user user  807 Jul 12 16:58 .profile\\n-rw-r--r-- 1 user user    0 Oct 27 19:11 .sudo_as_admin_successful\\ndrwxr-xr-x 3 user user   60 Nov  2 16:33 HPC-ESE\\n\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-9e0f2220d62b4350",
+  content: "[]",
+}
+ ------ bashTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-bedb0fe035dab36a",
+  content: "{\"result\":{\"exitCode\":0,\"stdout\":\"total 4\\ndrwxr-xr-x 3 user user   60 Nov  2 16:33 .\\ndrwx------ 3 user user  128 Nov  2 16:33 ..\\ndrwxr-xr-x 7 user user 4096 Nov  2 16:33 .git\\nfatal: your current branch 'main' does not have any commits yet\\n\",\"stderr\":\"\"},\"stderr\":\"\",\"stdout\":\"total 4\\ndrwxr-xr-x 3 user user   60 Nov  2 16:33 .\\ndrwx------ 3 user user  128 Nov  2 16:33 ..\\ndrwxr-xr-x 7 user user 4096 Nov  2 16:33 .git\\nfatal: your current branch 'main' does not have any commits yet\\n\"}",
+}
+
+ ------ writeFile ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-b45beb00f3f4e28e",
+  content: "{\"result\":{\"name\":\"README.md\",\"path\":\"/home/user/HPC-ESE/README.md\",\"type\":\"file\"}}",
+}
+
+ ------ bashTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-a4643ec31ef0f27f",
+  content: "{\"result\":{\"exitCode\":0,\"stdout\":\"Switched to a new branch 'add-readme'\\n# HPC-ESE\\n\\nJai Shri Ram\\n\",\"stderr\":\"\"},\"stderr\":\"\",\"stdout\":\"Switched to a new branch 'add-readme'\\n# HPC-ESE\\n\\nJai Shri Ram\\n\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-9330b429bcf25be8",
+  content: "{\"stdout\":\"branch 'add-readme' set up to track 'origin/add-readme'.\\n\",\"stderr\":\"To https://github.com/ArthKulkarni93/HPC-ESE.git\\n * [new branch]      add-readme -> add-readme\\n\",\"exitCode\":0}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-bbff87539646717a",
+  content: "{\"error\":\"title and branch are required\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-95d36fa835704c6a",
+  content: "{\"error\":\"repo is required in the form owner/name\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-86abd85b39cd554e",
+  content: "{\"error\":\"title and branch are required\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-ad7fb2f83d3e0452",
+  content: "{\"error\":\"title and branch are required\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-9803cb2b369eb64d",
+  content: "{\"error\":\"repo is required in the form owner/name\"}",
+}
+
+ ------ githubTool ------ 
+{
+  role: "tool",
+  toolCallId: "chatcmpl-tool-81a0e8ca6a4afec2",
+  content: "{\"error\":\"github api failed with 422\",\"message\":\"Validation Failed\"}",
+}
+
+ ------ bashTool ------ 
+2600 | 	async wait() {
+2601 | 		var _this = this;
+2602 | 		await _this._wait;
+2603 | 		if (_this.iterationError) throw _this.iterationError;
+2604 | 		if (!_this.result) throw new SandboxError("Process exited without a result");
+2605 | 		if (_this.result.exitCode !== 0) throw new CommandExitError(_this.result);
+                                                    ^
+CommandExitError: exit status 128
+ statusCode: undefined,
+     result: {
+  exitCode: 128,
+  error: "exit status 128",
+  stdout: "Switched to a new branch 'main'\nYour branch is based on 'origin/main', but the upstream is gone.\n  (use \"git branch --unset-upstream\" to fixup)\n[main f57118b] Initial commit\nfatal: could not read Username for 'https://github.com': No such device or address\n",
+  stderr: "",
+},
+
+      at wait (/Users/teerthkulkarni/Documents/teerth/Coding-Agent-TS/Agent/node_modules/e2b/dist/index.js:2605:46)
+

@@ -1,12 +1,14 @@
 import { type ChatMessages, type ChatResult } from "@openrouter/sdk/models"
 import {tools, openrouter, agenticLoop} from "../index.ts"
-const github_pat = process.env.GITHUB_PAT
+// const github_pat = process.env.GITHUB_PAT
+import { box } from "../index.ts"
+
 
 export async function bashTool(args:{command:string}):Promise<object>{
     
     // GITHUB_PAT is removed from the env so the llm can't read it with `echo $GITHUB_PAT` or `env`
-    const result = await Bun.$`bash -c ${args.command}`.env({...process.env, GITHUB_PAT:undefined}).nothrow()
-
+    // const result = await Bun.$`bash -c ${args.command}`.env({...process.env, GITHUB_PAT:undefined}).nothrow()
+    const result = await box.commands.run(args.command) // need to look how to hide github pat here
     return {
         result:result,
         stderr:result.stderr.toString(),
@@ -20,7 +22,8 @@ export async function callLLM(messages:ChatMessages[]):Promise<ChatResult> {
             messages,
             tools,
             stream:false,
-            model:"openrouter/auto"
+            model:"openrouter/auto",
+            maxTokens:3500
         }
     })
 
@@ -39,22 +42,23 @@ export async function callLLM(messages:ChatMessages[]):Promise<ChatResult> {
 }
 
 export async function writeFile(args:{fileName:string, content:string}){
-    const result = await Bun.write(args.fileName, args.content)
+    const result = await box.files.write(args.fileName, args.content)
     return {
         result:result
     }
 }
 
 export async function readFile(arg:{fileName:string}){
-    const readFile = await Bun.file(arg.fileName).text()
+    const readFile = await box.files.read(arg.fileName)
     return {
         result :readFile
     }
 }
 
 export async function editFile(args:{fileName:string, uniqueValue:string, newValue:string}){
-    let content = await Bun.file(args.fileName).text()
+    let res = await readFile({fileName:args.fileName})
 
+    let content = res.result
     content = content.replace(args.uniqueValue, args.newValue)
     const fileName = args.fileName
     const newArgs = {
@@ -103,7 +107,7 @@ type GithubArgs = {
 
 // git gets the PAT as an auth header through env vars, so it is never in the command or its output
 function gitEnv(){
-    const token = Buffer.from(`x-access-token:${github_pat}`).toString("base64")
+    const token = Buffer.from(`x-access-token:${"github_pat"}`).toString("base64")
     return {
         ...process.env,
         GIT_TERMINAL_PROMPT:"0", // never wait for a username/password prompt
@@ -114,7 +118,13 @@ function gitEnv(){
 }
 
 async function runGit(args:string[], dir?:string){
-    const result = await Bun.$`git ${args}`.cwd(dir ?? process.cwd()).env(gitEnv()).nothrow().quiet()
+    const cmd = `git ${args
+            .map(arg => `'${arg.replace(/'/g, "'\\''")}'`)
+            .join(" ")}`;
+    const result = await box.commands.run(cmd, {
+        cwd: dir ?? '/home/user',
+        envs: gitEnv(),
+    })
     return {
         stdout:result.stdout.toString(),
         stderr:result.stderr.toString(),
@@ -122,11 +132,40 @@ async function runGit(args:string[], dir?:string){
     }
 }
 
+async function setConfigDetails(
+    args: { name: string; email: string },
+    dir: string
+) {
+    const nameResult = await box.commands.run(
+        `git config user.name '${args.name.replace(/'/g, "'\\''")}'`,
+        { cwd: dir }
+    );
+
+    if (nameResult.exitCode !== 0) {
+        return {
+            stdout: nameResult.stdout,
+            stderr: nameResult.stderr,
+            exitCode: nameResult.exitCode
+        };
+    }
+
+    const emailResult = await box.commands.run(
+        `git config user.email '${args.email.replace(/'/g, "'\\''")}'`,
+        { cwd: dir }
+    );
+
+    return {
+        stdout: emailResult.stdout,
+        stderr: emailResult.stderr,
+        exitCode: emailResult.exitCode
+    };
+}
+
 async function githubApi(method:string, path:string, body?:object){
     const res = await fetch(`https://api.github.com${path}`, {
         method,
         headers:{
-            Authorization:`Bearer ${github_pat}`,
+            Authorization:`Bearer ${"github_pat_"}`,
             Accept:"application/vnd.github+json",
             "User-Agent":"coding-agent",
             "Content-Type":"application/json"
@@ -143,9 +182,9 @@ async function githubApi(method:string, path:string, body?:object){
 }
 
 export async function githubTool(args:GithubArgs):Promise<object>{
-    if(!github_pat){
-        return {error:"GITHUB_PAT is missing in .env"}
-    }
+    // if(!github_pat){
+    //     return {error:"GITHUB_PAT is missing in .env"}
+    // }
 
     const {action, repo, dir, branch, message, title, body, issueNumber} = args
     const base = args.base ?? "main"
@@ -163,8 +202,30 @@ export async function githubTool(args:GithubArgs):Promise<object>{
     }
 
     switch(action){
-        case "clone":
-            return await runGit(["clone", `https://github.com/${repo}.git`, dir ?? repo!.split("/")[1]!])
+        case "clone": {
+            const repoDir = dir ?? repo!.split("/")[1]!;
+
+            const clone = await runGit([
+                "clone",
+                `https://github.com/${repo}.git`,
+                repoDir
+            ]);
+
+            if (clone.exitCode !== 0) return clone;
+
+            const config = await setConfigDetails({
+                name: "ArthKulkarni93",
+                email: "arthteerth93@gmail.com"
+            }, `/home/user/${repoDir}`);
+
+            if (config.exitCode !== 0) return config;
+
+            return {
+                ...clone,
+                message: "Repository cloned and Git identity configured",
+                repoPath: `/home/user/${repoDir}`
+            };
+        }
 
         case "pull":
             return await runGit(["pull"], dir)

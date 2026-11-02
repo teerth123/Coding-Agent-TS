@@ -3,18 +3,27 @@
 //subagents  -- done
 
 import { OpenRouter } from "@openrouter/sdk";
-import { type ChatToolMessage, type ChatFunctionTool, type ChatMessages, type ChatResult, falseToJSON, type ToolCall, type ChatToolCall } from "@openrouter/sdk/models";
+import { type ChatToolMessage, type ChatFunctionTool, type ChatMessages, type ChatToolCall } from "@openrouter/sdk/models";
 import {bashTool, callLLM, readFile, writeFile, editFile, subAgent, githubTool} from "./Tools/index"
 import {Sandbox} from "@e2b/code-interpreter";
 
 
-const box = await Sandbox.create()
+// const E2B_API_KEY = process.env.E2B_API_KEY
+// if(!E2B_API_KEY){
+//     throw new Error("e2b api not found")
+// }
+
+export const box = await Sandbox.create({
+    apiKey:""
+})
 
 
 const openrouter_api_key = process.env.OPENROUTER_API_KEY
-
+// if(!openrouter_api_key){
+//     throw new Error("openrouter api not found")
+// }
 export const openrouter = new OpenRouter({
-    apiKey:openrouter_api_key
+    apiKey:"",
 })
 
 export const tools:ChatFunctionTool[] = [
@@ -263,6 +272,9 @@ export async function agenticLoop(history:unknown[]){
             console.log(result)
         }
     }
+
+    const killingAfterUse = await box.kill()
+    console.log("this is end of the sanbox" + killingAfterUse)
 
 
     const lastMessage = messages[messages.length -1]?.content
